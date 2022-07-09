@@ -11,9 +11,8 @@ from keras.utils import to_categorical
 labels = scipy.io.loadmat('imagelabels.mat')['labels']
 labels = np.transpose(labels)[:,0]
 input_directory = "jpg_raw"
-output_directory = "jpg_cls-0"
+output_directory = "jpg_cls-1"
 DATASET_SIZE =8189
-SPLITS = 1
 
 X_train_index, X_test_index, y_train_index, y_test_index = train_test_split(
     np.array(range(1,DATASET_SIZE+1)),
@@ -55,7 +54,7 @@ for i,filename in enumerate(os.listdir(input_directory)):
     metadata[base]["X"].append(image_index)
     metadata[base]["y"].append(int(cls))
 
-with open('jpg_cls-0/meta-data.json', 'w', encoding='utf-8') as f:
+with open('jpg_cls-1/meta-data.json', 'w', encoding='utf-8') as f:
     json.dump(metadata, f, ensure_ascii=False, indent=4)
 
 print("Organized")
