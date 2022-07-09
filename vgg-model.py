@@ -38,14 +38,6 @@ def prepare_images(X: list,base_path,enable:bool=False):
 
     return np.row_stack(result),len(images)
 
-
-def multi(y,mul):
-    y_ench = list()
-    for y in y:
-        for _ in range(mul):
-            y_ench.append(y)
-    return np.array(y_ench)
-
 def main():
         with open('jpg_cls-0/meta-data.json', 'r') as f:
             #Read data
@@ -66,36 +58,12 @@ def main():
             y_valid = sorted(metadata["valid"]["y"])
             X_test = sorted(metadata["test"]["X"])[:20]
             y_test = sorted(metadata["test"]["y"])[:20]
-
-
             n_train = len(X_train)
             n_valid = len(X_valid)
             batch_size = 8
 
-
             train_batch_gen = BatchGenerator(X_train, y_train, batch_size,train_input_dir,train=True)
             valid_batch_gen = BatchGenerator(X_valid, y_valid, batch_size,valid_input_dir,train=False)
-
-
-
-
-            #prepare images
-            #X_train, train_mul = prepare_images(X_train,train_input_dir,enable=False)
-            # path = os.path.join(train_input_dir, f'image_{1:05d}.jpg')
-            # org_image = load_img(path, target_size=(300, 300))
-            # image = img_to_array(org_image)
-            # image = image.reshape((1, image.shape[0], image.shape[1], image.shape[2]))
-            # # prepare the image for the VGG model
-            # image = preprocess_input(image)
-            # y_train = multi(y_train,train_mul)
-            # y_train = to_categorical(y_train,num_classes=n_classes)
-            #
-            # X_valid, valid_mul = prepare_images(X_valid, valid_input_dir, enable=False)
-            # y_valid = multi(y_valid, valid_mul)
-            # y_valid = to_categorical(y_valid, num_classes=n_classes)
-
-
-
 
             # base_ model
             if not relearn:
@@ -107,9 +75,7 @@ def main():
 
                 dense_layer_1 = layers.Dense(2000, activation='relu')
                 dense_layer_2 = layers.Dense(2000, activation='relu')
-                #dense_layer_3 = layers.Dense(2000, activation='relu')
                 drop_out_layer_1 = layers.Dropout(0.4)
-                #dense_layer_2 = layers.Dense(2000, activation='relu')
                 prediction_layer = layers.Dense(n_classes, activation='softmax')
 
                 model = models.Sequential([
@@ -117,7 +83,6 @@ def main():
                     flatten_layer,
                     dense_layer_1,
                     dense_layer_2,
-                    #dense_layer_3,
                     drop_out_layer_1,
                     prediction_layer
                 ])
@@ -128,10 +93,9 @@ def main():
                     metrics=['accuracy'],
                 )
             else:
-                model = models.load_model('modelgit .h5')
+                model = models.load_model('model .h5')
             checkpoint = ModelCheckpoint(filepath="model.h5",save_best_only=True)
             es = EarlyStopping(monitor='accuracy', mode='max', patience=4, restore_best_weights=True)
-            #model.fit(X_train, y_train, epochs= 5, batch_size=32,callbacks=[es],validation_data=(X_valid,y_valid))
             model.summary()
             model.fit_generator(generator=train_batch_gen,
                                 steps_per_epoch= int(n_train/batch_size),
@@ -146,7 +110,7 @@ def main():
             # prepare images
 
             X_test, test_mul = prepare_images(X_test, test_input_dir, enable=False)
-            y_test = multi(y_test, test_mul)-1
+            y_test = np.array(y_test) - 1
 
             prediction = model.predict(X_test)
             prediction = np.array([np.argmax(poss == max(poss)) for poss in prediction])

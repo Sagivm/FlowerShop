@@ -38,8 +38,8 @@ class BatchGenerator(keras.utils.Sequence):
                     org_image,
                     org_image.transpose(Image.FLIP_LEFT_RIGHT),
                     org_image.transpose(Image.FLIP_TOP_BOTTOM),
-                    #org_image.rotate(15),
-                    #org_image.rotate(-15),
+                    org_image.rotate(15),
+                    org_image.rotate(-15),
                     org_image.rotate(30),
                     org_image.rotate(-30)
                 ]
