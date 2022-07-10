@@ -14,6 +14,7 @@ input_directory = "jpg_raw"
 output_directory = "jpg_cls-1"
 DATASET_SIZE =8189
 
+# devide image indexs between train validation and test
 X_train_index, X_test_index, y_train_index, y_test_index = train_test_split(
     np.array(range(1,DATASET_SIZE+1)),
     labels,
@@ -25,6 +26,7 @@ X_test_index, X_valid_index, y_test_index, y_valid_index = train_test_split(
 
 metadata=dict()
 
+# Making relevant folders
 os.mkdir(os.path.join(output_directory,'train'))
 metadata["train"] = {"X":list(),"y":list()}
 os.mkdir(os.path.join(output_directory,'valid'))

@@ -37,17 +37,17 @@ def main():
         y = np.transpose(y)
         n_classes = 102
         SPLIT = 0
-        relearn = True
+        relearn = False
         train_input_dir = os.path.join('jpg_cls-0', "train")
         valid_input_dir = os.path.join('jpg_cls-0', "valid")
         test_input_dir = os.path.join('jpg_cls-0', "test")
 
-        X_train = sorted(metadata["train"]["X"])[:5000]
-        y_train = sorted(metadata["train"]["y"])[:5000]
+        X_train = sorted(metadata["train"]["X"])
+        y_train = sorted(metadata["train"]["y"])
         X_valid = sorted(metadata["valid"]["X"])
         y_valid = sorted(metadata["valid"]["y"])
-        X_test = sorted(metadata["test"]["X"])[:20]
-        y_test = sorted(metadata["test"]["y"])[:20]
+        X_test = sorted(metadata["test"]["X"])
+        y_test = sorted(metadata["test"]["y"])
         n_train = len(X_train)
         n_valid = len(X_valid)
         batch_size = 8
@@ -55,9 +55,16 @@ def main():
         train_batch_gen = BatchGenerator(X_train, y_train, batch_size, train_input_dir, train=True)
         valid_batch_gen = BatchGenerator(X_valid, y_valid, batch_size, valid_input_dir, train=False)
 
+        path = os.path.join(test_input_dir, f'image_{1:05d}.jpg')
+        base_image = load_img(path, target_size=(224, 224))
+        image = img_to_array(base_image)
+        image = image.reshape((1, image.shape[0], image.shape[1], image.shape[2]))
+        # prepare the image for the VGG model
+        image = preprocess_input(image)
+
         # base_ model
         if not relearn:
-            base_model = VGG16(include_top=False)
+            base_model = Xception(include_top=False,input_shape=image[0].shape)
             base_model.trainable = False
 
             # Advance model
